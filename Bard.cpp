@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  University of Hawaii, College of Engineering
-//  Lab 12b - Game Character Class Part III - ECE 205 - Spring 2025
+//  Lab 14a - RPG Beta - ECE 205 - Spring 2025
 //
 ///
 /// @file    Bard.cpp
@@ -21,7 +21,7 @@ Bard::Bard(const std::string& newName, int newRace) : PlayerCharacter(newName, n
 
 // performAction overridden
 // inherited method
-void Bard::performAction() {
+void Bard::performAction(bool isEnemy) {
     int actionChoice;
     std::cout << "Choose an action for " << name << " (Health: " << getHealth() << "):" << std::endl;
     std::cout << "Option 0 - Healing Melody (min 7 on D20 | healing = roll + Wisdom: " << wisdom << ")" << std::endl;
@@ -47,14 +47,14 @@ void Bard::healingMelody() {
     int healing = 0;
 
     canPerformHealingMelody = bardRollDice(1,20);
-    std::cout << "You rolled a " << canPerformHealingMelody << "." << std::endl;
+    std::cout << name << " rolled a " << canPerformHealingMelody << "." << std::endl;
 
     if (canPerformHealingMelody >= 7) {
         healing = canPerformHealingMelody + wisdom;
-        std::cout << "Your song fills the air, healing those in your presence. Health restored is " << healing << "." << std::endl;
+        std::cout << name << "'s song fills the air, healing those in their presence. Health restored is " << healing << "." << std::endl;
     } else {
         healing = 0;
-        std::cout << "Your song falters, failing to reach wounded allies. Health restored is 0." << std::endl;
+        std::cout << name << "'s song falters, failing to reach wounded allies. Health restored is 0." << std::endl;
     }
 
     setHealthRestored(healing);
@@ -66,7 +66,7 @@ void Bard::counterPerformance() {
     int damage = 0;
     canPerformCounterPerformance = bardRollDice(1,20);
 
-    std::cout << "You rolled a " << canPerformCounterPerformance << "." << std::endl;
+    std::cout << name << " rolled a " << canPerformCounterPerformance << "." << std::endl;
     
     if (canPerformCounterPerformance >= 5) {
         damage = canPerformCounterPerformance + charisma;

@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  University of Hawaii, College of Engineering
-//  Lab 12a - Game Character Class Part III - ECE 205 - Spring 2025
+//  Lab 14a - RPG Beta - ECE 205 - Spring 2025
 //
 ///
 /// @file    main.cpp
@@ -15,7 +15,11 @@
 #include "Hunter.hpp"
 #include "Blacksmith.hpp"
 #include "Bard.hpp"
+#include "Battle.hpp"
+#include <fstream>
+#include "json.hpp"
 
+using json = nlohmann::json;
 using namespace std;
 
 //The following program demonstrates how you might call some of the functions in your new class
@@ -25,6 +29,14 @@ using namespace std;
 
 int main()
 {
+    json characterData;
+    ifstream inFile("adventure.json");
+    if (!inFile) {
+        cerr << "Failed to load preset character data.\n";
+        return 1;
+    }
+    inFile >> characterData;
+
     srand(time(nullptr));
     //declare variables
     string characterName;
@@ -32,143 +44,205 @@ int main()
     string userResponse;
     int characterProfession;
     int actionChoice;
+    int makeCharacterChoice;
     int numPlayers;
 
-    cout << "How many characters are in your adventure party?: ";
-    cin >> numPlayers;
+    while (true) {
+        cout << "Would you like to: " << endl;
+        cout << "(1) Create your own character(s)" << endl;
+        cout << "(2) Use an existing character" << endl;
+        cout << "Enter 1 or 2: " << endl;
+        cin >> makeCharacterChoice;
+
+        if (makeCharacterChoice < 1 || makeCharacterChoice > 2) {
+            cout << "Invalid value! Please enter 1 or 2." << endl;
+        } else {
+            break;
+        }
+    }
 
     std::vector<PlayerCharacter*> adventureParty;
 
-    for (int i = 0; i < numPlayers; i++) {
-        cout << "\n";
-        cout << "Creating Player " << i + 1 << ":" << endl;
+    if (makeCharacterChoice == 1) {
+        cout << "How many characters are in your adventure party?: ";
+        cin >> numPlayers;
 
-        //define variables
-        cout << "Enter a name for your character: ";
-        cin >> characterName;
+        for (int i = 0; i < numPlayers; i++) {
+            cout << "\n";
+            cout << "Creating Player " << i + 1 << ":" << endl;
 
-        // Checks for valid race input
-        while (true) {
-            cout << "Enter a race for your character (0 = Dwarf, 1 = Elf, 2 = Human, 3 = Orc): ";
-            cin >> characterRace;
-            if (characterRace < 0 || characterRace > 3) {
-                cout << "Invalid value!" << endl;
-            } else {
-                break;
-            }
-        }
+            //define variables
+            cout << "Enter a name for your character: ";
+            cin >> characterName;
 
-        // Checks for valid profession input
-        while (true) {
-            cout << "Enter a profession for your character (0 = Bard, 1 = Blacksmith, 2 = Hunter): ";
-            cin >> characterProfession;
-            if (characterProfession < 0 || characterProfession > 2) {
-                cout << "Invalid value!" << endl;
-            } else {
-                break;
-            }
-        }
-
-        PlayerCharacter* player = nullptr;
-
-        if (characterProfession == 0) {
-            player = new Bard(characterName, characterRace);
-        } else if (characterProfession == 1) {
-            player = new Blacksmith(characterName, characterRace);
-        } else if (characterProfession == 2) {
-            player = new Hunter(characterName, characterRace);
-        }
-
-        player->displayStats();
-
-        if (characterProfession == 0) {
-            dynamic_cast<Bard*>(player)->displayBardStats();
-        } else if (characterProfession == 1) {
-            dynamic_cast<Blacksmith*>(player)->displayBlacksmithStats();
-        } else if (characterProfession == 2) {
-            dynamic_cast<Hunter*>(player)->displayHunterStats();
-        }
-
-        adventureParty.push_back(player);
-    }
-
-    // display battle rules
-    cout << "Here are the battle rules: " << endl;
-    cout << "Each player will select a target, then an action when it's their turn to attack. Actions require a minimum" << endl;
-    cout << "dice roll on a 20-sided die (D20) to be successful. If successful, the damage dealt to their foe's health " << endl;
-    cout << "will be the dice roll value + unique attribute." << endl;
-
-    cout << "Let the battle commence! BEGIN!" << endl;
-    cout << "-----------------------------------" << endl;
-    
-    while (true) {
-        for (size_t i = 0; i < adventureParty.size(); ++i) {
-            PlayerCharacter *attacker = adventureParty[i];
-
-            if (attacker->getHealth() <= 0) {
-                continue;
-            }
-
-            int targetChoice;
-            cout << attacker->getName() << "'s turn!" << endl;
-
+            // Checks for valid race input
             while (true) {
-                std::cout << "Choose a target: " << std::endl;
-                for (size_t j = 0; j < adventureParty.size(); ++j) {
-                    if (i != j && adventureParty[j]->getHealth() > 0) {
-                        std::cout << j << ": " << adventureParty[j]->getName() << std::endl;
-                    }
-                }
-
-                std::cin >> targetChoice;
-                if (targetChoice < 0 || targetChoice > adventureParty.size()) {
-                    std::cout << "Invalid value!" << std::endl;
+                cout << "Enter a race for your character (0 = Dwarf, 1 = Elf, 2 = Human, 3 = Orc): ";
+                cin >> characterRace;
+                if (characterRace < 0 || characterRace > 3) {
+                    cout << "Invalid value!" << endl;
                 } else {
                     break;
                 }
             }
 
-            PlayerCharacter *target = adventureParty[targetChoice];
-            attacker->performAction();
-
-            int damage = 0;
-            damage = attacker->getDamage(); // checks if the attacker does damage to the target
-            if (damage > 0) {
-                target->receiveDamage(damage); // if damage is done, the target's health is reduced
+            // Checks for valid profession input
+            while (true) {
+                cout << "Enter a profession for your character (0 = Bard, 1 = Blacksmith, 2 = Hunter): ";
+                cin >> characterProfession;
+                if (characterProfession < 0 || characterProfession > 2) {
+                    cout << "Invalid value!" << endl;
+                } else {
+                    break;
+                }
             }
-            attacker->setDamage(0); // resets damage back to 0
 
-            int healing = 0;
-            healing = attacker->getHealthRestored(); // checks if the attacker 
-            if (healing > 0) {
-                target->receiveHealthRestored(healing);
+            PlayerCharacter *player = nullptr;
+
+            if (characterProfession == 0) {
+                player = new Bard(characterName, characterRace);
+            } else if (characterProfession == 1) {
+                player = new Blacksmith(characterName, characterRace);
+            } else if (characterProfession == 2) {
+                player = new Hunter(characterName, characterRace);
             }
-            attacker->setHealthRestored(0); // resets healing back to 0
 
-            if (target->getHealth() <= 0) {
-                cout << "Foe " << target->getName() << "'s Remaining Health: 0" << "\n";
-            } else {
-                cout << "Foe " << target->getName() << "'s Remaining Health: " << target->getHealth() << "\n";
+            player->displayStats();
+
+            if (characterProfession == 0) {
+                dynamic_cast<Bard *>(player)->displayBardStats();
+            } else if (characterProfession == 1) {
+                dynamic_cast<Blacksmith *>(player)->displayBlacksmithStats();
+            } else if (characterProfession == 2) {
+                dynamic_cast<Hunter *>(player)->displayHunterStats();
             }
-            std::cout << "-----------------------------------" << std::endl;
-        }
 
-        // checks how many characters are alive after every turn
-        int aliveCount = 0;
-        PlayerCharacter* lastAlive = nullptr;
-        for (PlayerCharacter* pc : adventureParty) {
-            if (pc->getHealth() > 0) {
-                aliveCount++;
-                lastAlive = pc;
-            }
-        }
-
-        // if only one character is alive, the game ends!
-        if (aliveCount == 1) {
-            cout << "Game Over! " << lastAlive->getName() << " is victorious!" << endl;
-            cout << "-----------------------------------" << endl;
-            break;
+            adventureParty.push_back(player);
         }
     }
+
+    else if (makeCharacterChoice == 2) {
+        const auto& characters = characterData["characters"];
+        cout << "Existing Characters:\n";
+        for (size_t i = 0; i < characters.size(); ++i) {
+            cout << i + 1 << ". " << characters[i]["name"]
+            << ", Race: " << characters[i]["raceName"]
+            << ", Profession: " << characters[i]["professionName"] << endl;
+        }
+
+        cout << "How many existing characters would you like to use?: ";
+        cin >> numPlayers;
+
+        for (int i = 0; i < numPlayers; ++i) {
+            int selection;
+
+            while (true) {
+                cout << "Enter the number of the character you want to use: ";
+                cin >> selection;
+
+                if (selection < 1 || selection > characters.size()) {
+                    cout << "Invalid value!" << endl;
+                } else {
+                    break;
+                }
+            }
+
+            auto& preset = characters[selection - 1];
+            string name = preset["name"];
+            int race = preset["raceCode"];
+            int profession = preset["profession"];
+
+            PlayerCharacter *player = nullptr;
+
+            if (profession == 0) {
+                player = new Bard(name, race);
+            } else if (profession == 1) {
+                player = new Blacksmith(name, race);
+            } else if (profession == 2) {
+                player = new Hunter(name, race);
+            }
+
+            player->displayStats();
+
+            if (profession == 0) {
+                dynamic_cast<Bard *>(player)->displayBardStats();
+            } else if (profession == 1) {
+                dynamic_cast<Blacksmith *>(player)->displayBlacksmithStats();
+            } else if (profession == 2) {
+                dynamic_cast<Hunter *>(player)->displayHunterStats();
+            }
+
+            adventureParty.push_back(player);
+        }
+    }
+
+    PlayerCharacter *enemy = new Blacksmith("Huskryn", 3);
+
+    unordered_map<string, json> adventureScenes;
+    string currentLocation = characterData["start"];
+
+    for (auto& [key, value] : characterData.items()) {
+        if (key != "start" && key != "characters") {
+            adventureScenes[key] = value;
+        }
+    }
+
+    while (adventureScenes.count(currentLocation)) {
+        auto& scene = adventureScenes[currentLocation];
+
+        cout << scene["setting"] << "\n";
+
+        // trigger battle
+        if (scene["triggerBattle"] == 1) {
+            Battle battle(adventureParty, enemy);
+            battle.startBattle();
+
+            int aliveCount = 0;
+            for (auto* pc : adventureParty)
+                if (pc->getHealth() > 0)
+                    aliveCount++;
+
+            if (aliveCount == 0) {
+                cout << "\nYour party has fallen. The adventure ends here.\n";
+                break;
+            } else {
+                currentLocation = "win";
+                continue;
+            }
+        }
+
+        if (currentLocation == "enter" || currentLocation == "leave") {
+            currentLocation = "ending";
+            continue;
+        }
+
+        if (!scene.contains("option1") || !scene.contains("option2")) {
+            break;
+        }
+
+        while (true) {
+            cout << "(1) " << scene["option1"] << "\n";
+            cout << "(2) " << scene["option2"] << "\n";
+            cout << "> ";
+
+            int choice;
+            cin >> choice;
+            if (choice == 1) {
+                currentLocation = scene["option1"];
+                break;
+            } else if (choice == 2) {
+                currentLocation = scene["option2"];
+                break;
+            } else if (choice < 1 || choice > 2) {
+                cout << "Invalid value! Please enter 1 or 2.\n";
+            }
+
+            if (currentLocation == "ending") {
+                cout << "\n" << adventureScenes["ending"]["setting"] << "\n";
+                break;
+            }
+        }
+    }
+    
     return 0;
 }

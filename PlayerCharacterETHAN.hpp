@@ -33,7 +33,7 @@ public:
 
     void reactToUser(const std::string& userInput);
 
-    virtual void performAction();
+    virtual void performAction(bool isEnemy);
 
     void receiveDamage(int damage);
     void receiveHealth(int health);

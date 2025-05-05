@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  University of Hawaii, College of Engineering
-//  Lab 12b - Game Character Class Part III - ECE 205 - Spring 2025
+//  Lab 14a - RPG Beta - ECE 205 - Spring 2025
 //
 ///
 /// @file    Blacksmith.cpp
@@ -25,7 +25,7 @@ public:
     void moltenBlast();
 
     // performAction override
-    void performAction() override;
+    void performAction(bool isEnemy) override;
 
     //greet override
     void greet() const override;

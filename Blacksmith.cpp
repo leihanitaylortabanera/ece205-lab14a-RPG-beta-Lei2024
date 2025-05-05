@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  University of Hawaii, College of Engineering
-//  Lab 12b - Game Character Class Part III - ECE 205 - Spring 2025
+//  Lab 14a - RPG Beta - ECE 205 - Spring 2025
 //
 ///
 /// @file    Blacksmith.cpp
@@ -20,12 +20,22 @@ Blacksmith::Blacksmith(const std::string& newName, int newRace) : PlayerCharacte
 
 // performAction overridden
 // inherited method
-void Blacksmith::performAction() {
+void Blacksmith::performAction(bool isEnemy) {
     int actionChoice;
-    std::cout << "Choose an action for " << name << " (Health: " << getHealth() << "):" << std::endl;
-    std::cout << "Option 0 - Weapon Strike (min 4 on D20 | damage = roll + Craftsmanship: " << craftsmanship << ")" << std::endl;
-    std::cout << "Option 1 - Molten Blast (min 5 on D20 | damage = roll + Metal Manipulation: " << metal_manipulation << ")" << std::endl;
-    std::cin >> actionChoice;
+
+    if (isEnemy) {
+        actionChoice = blacksmithRollDice(0, 1);
+        if (actionChoice == 0) {
+            std::cout << name << " unleashes Weapon Strike!" << std::endl;
+        } else if (actionChoice == 2) {
+            std::cout << name << "unleashes Molten Blast!" << std::endl;
+        }
+    } else {
+        std::cout << "Choose an action for " << name << " (Health: " << getHealth() << "):" << std::endl;
+        std::cout << "Option 0 - Weapon Strike (min 4 on D20 | damage = roll + Craftsmanship: " << craftsmanship << ")" << std::endl;
+        std::cout << "Option 1 - Molten Blast (min 5 on D20 | damage = roll + Metal Manipulation: " << metal_manipulation << ")" << std::endl;
+        std::cin >> actionChoice;
+    }
 
     while (true) {
         if (actionChoice == 0) {
@@ -46,14 +56,14 @@ void Blacksmith::weaponStrike() {
     int damage;
 
     canPerformWeaponStrike = blacksmithRollDice(1,20);
-    std::cout << "You rolled a " << canPerformWeaponStrike << std::endl;
+    std::cout << name << " rolled a " << canPerformWeaponStrike << std::endl;
 
     if (canPerformWeaponStrike >= 4) {
         damage = canPerformWeaponStrike + craftsmanship;
-        std::cout << "You swing with might, your weapon cutting through the foe. Damage dealt is " << damage << "." << std::endl;
+        std::cout << name << " swings with might, their weapon cutting through the foe. Damage dealt is " << damage << "." << std::endl;
     } else {
         damage = 0;
-        std::cout << "Your strike misses its mark, and your enemy evades with ease. Damage dealt is 0." << std::endl;
+        std::cout << name << "'s strike misses its mark, and their target evades with ease. Damage dealt is 0." << std::endl;
     }
     setDamage(damage);
 }
@@ -64,7 +74,7 @@ void Blacksmith::moltenBlast() {
     int damage;
 
     canPerformMoltenBlast = blacksmithRollDice(1,20);
-    std::cout << "You rolled a " << canPerformMoltenBlast << std::endl;
+    std::cout << name << " rolled a " << canPerformMoltenBlast << std::endl;
 
     if (canPerformMoltenBlast >= 5) {
         damage = canPerformMoltenBlast + metal_manipulation;

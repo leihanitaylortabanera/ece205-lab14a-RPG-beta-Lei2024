@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  University of Hawaii, College of Engineering
-//  Lab 12b - Game Character Class Part III - ECE 205 - Spring 2025
+//  Lab 14a - RPG Beta - ECE 205 - Spring 2025
 //
 ///
 /// @file    Hunter.cpp
@@ -21,7 +21,7 @@ Hunter::Hunter(const std::string& newName, int newRace) : PlayerCharacter(newNam
 
 // performAction overridden
 // inherited method
-void Hunter::performAction() {
+void Hunter::performAction(bool isEnemy) {
     int actionChoice;
     std::cout << "Choose an action for " << name << " (Health: " << getHealth() << "):" << std::endl;
     std::cout << "Option 0 - Arrow Barrage (min 6 on D20 | damage = roll + Aim Accuracy: " << aim_accuracy << ")" << std::endl;
@@ -47,14 +47,14 @@ void Hunter::arrowBarrage() {
     int damage;
 
     canPerformArrowBarrage = hunterRollDice(1,20);
-    std::cout << "You rolled a " << canPerformArrowBarrage << std::endl;
+    std::cout << name << " rolled a " << canPerformArrowBarrage << std::endl;
 
     if (canPerformArrowBarrage >= 6) {
         damage = canPerformArrowBarrage + aim_accuracy;
-        std::cout << "A hail of arrows rains down, striking your enemies from all sides. Damage dealt is " << damage << ".\n" << std::endl;
+        std::cout << "A hail of arrows rains down, striking " << name << "'s enemies from all sides. Damage dealt is " << damage << ".\n" << std::endl;
     } else {
         damage = 0;
-        std::cout << "Your arrows fall short, the barrage failing to reach its target. Damage dealt is 0.\n" << std::endl;
+        std::cout << name << "'s arrows fall short, the barrage failing to reach its target. Damage dealt is 0.\n" << std::endl;
     }
     setDamage(damage);
 }
@@ -65,14 +65,14 @@ void Hunter::backstabShot() {
     int damage;
 
     canPerformBackstabShot = hunterRollDice(1,20);
-    std::cout << "You rolled a " << canPerformBackstabShot << std::endl;
+    std::cout << name << " rolled a " << canPerformBackstabShot << std::endl;
 
     if (canPerformBackstabShot >= 3) {
         damage = canPerformBackstabShot + stealth;
-        std::cout << "You vanish into the gloom, draw a silent breath, and unleash a precise shot straight into your enemy’s blind spot. Damage dealt is " << damage << "." << std::endl;
+        std::cout << name << " vanishes into the gloom, draws a silent breath, and unleashes a precise shot straight into the enemy’s blind spot. Damage dealt is " << damage << "." << std::endl;
     } else {
         damage = 0;
-        std::cout << "You try to blend into the surroundings, but you have been spotted instantly and your arrow was dodged instantly. Damage dealt is 0." << std::endl;
+        std::cout << name << " tries to blend into the surroundings, but they have been spotted instantly and their arrow was dodged instantly. Damage dealt is 0." << std::endl;
     }
     setDamage(damage);
 }

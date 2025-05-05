@@ -71,7 +71,7 @@ void PlayerCharacter::reactToUser(const std::string& userInput) {
     }
 }
 
-void PlayerCharacter::performAction() {
+void PlayerCharacter::performAction(bool isEnemy) {
     std::cout << "I'm sorry, there's nothing I can do." << std::endl;
 }
 
