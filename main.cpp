@@ -243,6 +243,14 @@ int main()
             }
         }
     }
+
+    // Clean up memory for the players in adventureParty
+    for (auto* pc : adventureParty) {
+        delete pc;  // Delete each PlayerCharacter object
+    }
+
+    // Clean up the enemy
+    delete enemy;
     
     return 0;
 }
